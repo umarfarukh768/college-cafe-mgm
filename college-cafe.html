@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Brew & Study — College Café</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&family=Space+Mono&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --cream: #f5efe6;
+      --warm: #e8d5b7;
+      --caramel: #c9935a;
+      --espresso: #2c1a0e;
+      --mocha: #5c3317;
+      --latte: #9c6b3c;
+      --sage: #7a8c6e;
+      --steam: rgba(255,255,255,0.07);
+      --text: #1e120a;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--cream);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ─── CURSOR ─── */
+    .cursor {
+      width: 12px; height: 12px;
+      background: var(--caramel);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9999;
+      transition: transform 0.15s ease;
+      mix-blend-mode: multiply;
+    }
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 1.5px solid var(--caramel);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9998;
+      transition: transform 0.35s ease, opacity 0.3s;
+      opacity: 0.5;
+    }
+
+    /* ─── NOISE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 1000; opacity: 0.4;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 500;
+      padding: 1.2rem 4rem;
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(245,239,230,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(201,147,90,0.15);
+      transition: all 0.4s ease;
+    }
+    nav.scrolled {
+      padding: 0.8rem 4rem;
+      background: rgba(245,239,230,0.97);
+      box-shadow: 0 4px 24px rgba(44,26,14,0.08);
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 900;
+      color: var(--espresso);
+      letter-spacing: -0.5px;
+    }
+    .nav-logo span { color: var(--caramel); }
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.88rem; font-weight: 500;
+      color: var(--mocha); text-decoration: none;
+      letter-spacing: 0.03em; text-transform: uppercase;
+      position: relative; padding-bottom: 2px;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: 0; left: 0;
+      width: 0; height: 1.5px; background: var(--caramel);
+      transition: width 0.3s ease;
+    }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-cta {
+      background: var(--espresso); color: var(--cream) !important;
+      padding: 0.5rem 1.4rem; border-radius: 2rem;
+      transition: background 0.3s ease !important;
+    }
+    .nav-cta:hover { background: var(--caramel) !important; }
+    .nav-cta::after { display: none !important; }
+
+    /* ─── HERO ─── */
+    .hero {
+      min-height: 100vh;
+      display: grid; grid-template-columns: 1fr 1fr;
+      padding: 8rem 4rem 4rem;
+      gap: 2rem; align-items: center;
+      position: relative; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 70% 50%, rgba(201,147,90,0.12) 0%, transparent 60%),
+                  radial-gradient(ellipse at 20% 80%, rgba(122,140,110,0.08) 0%, transparent 50%);
+    }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--warm); border-radius: 2rem;
+      padding: 0.35rem 1rem; margin-bottom: 1.5rem;
+      font-size: 0.78rem; font-weight: 500; color: var(--mocha);
+      letter-spacing: 0.05em; text-transform: uppercase;
+      animation: fadeUp 0.8s ease both;
+    }
+    .hero-tag::before { content: '●'; color: var(--caramel); font-size: 0.5rem; }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3.2rem, 5.5vw, 6rem);
+      font-weight: 900; line-height: 1.05;
+      color: var(--espresso);
+      animation: fadeUp 0.9s 0.1s ease both;
+    }
+    .hero h1 em { font-style: italic; color: var(--caramel); }
+    .hero-sub {
+      font-size: 1.05rem; color: var(--latte); margin: 1.5rem 0 2.5rem;
+      max-width: 440px; line-height: 1.7;
+      animation: fadeUp 1s 0.2s ease both;
+    }
+    .hero-actions {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      animation: fadeUp 1s 0.3s ease both;
+    }
+    .btn-primary {
+      background: var(--espresso); color: var(--cream);
+      padding: 0.85rem 2rem; border-radius: 3rem;
+      font-size: 0.9rem; font-weight: 500;
+      border: none; cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 0.02em;
+    }
+    .btn-primary:hover { background: var(--caramel); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,147,90,0.35); }
+    .btn-outline {
+      background: transparent; color: var(--espresso);
+      padding: 0.85rem 2rem; border-radius: 3rem;
+      font-size: 0.9rem; font-weight: 500;
+      border: 1.5px solid var(--espresso); cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .btn-outline:hover { background: var(--espresso); color: var(--cream); transform: translateY(-2px); }
+    .hero-stats {
+      display: flex; gap: 2rem; margin-top: 3rem;
+      animation: fadeUp 1s 0.4s ease both;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem; font-weight: 900; color: var(--espresso);
+      display: block; line-height: 1;
+    }
+    .stat-label { font-size: 0.78rem; color: var(--latte); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 0.3rem; }
+
+    .hero-visual {
+      position: relative; display: flex; justify-content: center; align-items: center;
+      animation: fadeIn 1.2s 0.3s ease both;
+    }
+    .hero-card-big {
+      width: 340px; height: 420px;
+      background: var(--espresso);
+      border-radius: 2rem 2rem 40% 40% / 2rem 2rem 50% 50%;
+      position: relative; overflow: hidden;
+      box-shadow: 0 40px 80px rgba(44,26,14,0.3);
+    }
+    .hero-card-big::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(160deg, rgba(201,147,90,0.3) 0%, transparent 60%);
+    }
+    .cup-svg {
+      position: absolute; bottom: -10px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 10rem; opacity: 0.15;
+    }
+    .hero-badge {
+      position: absolute; top: 1.5rem; right: 1.5rem;
+      background: var(--caramel); color: white;
+      width: 80px; height: 80px; border-radius: 50%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      font-size: 0.65rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      text-align: center; line-height: 1.3;
+      animation: spin 20s linear infinite;
+    }
+    .floating-tag {
+      position: absolute; background: white;
+      border-radius: 1rem; padding: 0.7rem 1.2rem;
+      box-shadow: 0 8px 24px rgba(44,26,14,0.12);
+      font-size: 0.82rem; font-weight: 500;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .ft-1 { top: 1.5rem; left: -2rem; animation: float 4s ease-in-out infinite; }
+    .ft-2 { bottom: 4rem; right: -2rem; animation: float 4s 1.5s ease-in-out infinite; }
+    .ft-3 { bottom: 1rem; left: 0; animation: float 4s 0.8s ease-in-out infinite; }
+
+    /* ─── MARQUEE ─── */
+    .marquee-wrap {
+      background: var(--espresso); overflow: hidden;
+      padding: 1rem 0; white-space: nowrap;
+    }
+    .marquee-track {
+      display: inline-block;
+      animation: marquee 25s linear infinite;
+    }
+    .marquee-item {
+      display: inline-flex; align-items: center; gap: 1rem;
+      color: var(--warm); font-size: 0.85rem;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      margin-right: 3rem;
+    }
+    .marquee-dot { color: var(--caramel); font-size: 1.2rem; }
+
+    /* ─── SECTION COMMON ─── */
+    section { padding: 6rem 4rem; }
+    .section-tag {
+      display: inline-block;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem; color: var(--caramel);
+      text-transform: uppercase; letter-spacing: 0.12em;
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 3.5vw, 3.2rem);
+      font-weight: 900; color: var(--espresso);
+      line-height: 1.1; margin-bottom: 1rem;
+    }
+
+    /* ─── MENU ─── */
+    #menu { background: white; }
+    .menu-header { text-align: center; margin-bottom: 3rem; }
+    .menu-tabs {
+      display: flex; justify-content: center;
+      gap: 0.5rem; margin: 2rem 0;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      padding: 0.55rem 1.5rem; border-radius: 2rem;
+      border: 1.5px solid var(--warm);
+      background: transparent; color: var(--mocha);
+      font-size: 0.85rem; font-weight: 500;
+      cursor: pointer; transition: all 0.3s ease;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .tab-btn.active, .tab-btn:hover {
+      background: var(--espresso); color: var(--cream);
+      border-color: var(--espresso);
+    }
+    .menu-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 1.5rem;
+    }
+    .menu-card {
+      background: var(--cream); border-radius: 1.5rem;
+      padding: 1.5rem; position: relative;
+      transition: all 0.35s ease; cursor: pointer;
+      border: 1px solid transparent;
+      opacity: 0; transform: translateY(20px);
+      animation: fadeUp 0.5s ease forwards;
+    }
+    .menu-card:hover {
+      border-color: var(--caramel);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(201,147,90,0.15);
+    }
+    .menu-emoji {
+      font-size: 3rem; margin-bottom: 1rem; display: block;
+      transition: transform 0.3s ease;
+    }
+    .menu-card:hover .menu-emoji { transform: scale(1.15) rotate(-5deg); }
+    .menu-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; font-weight: 700; color: var(--espresso);
+      margin-bottom: 0.4rem;
+    }
+    .menu-desc { font-size: 0.82rem; color: var(--latte); line-height: 1.5; margin-bottom: 1.2rem; }
+    .menu-footer { display: flex; justify-content: space-between; align-items: center; }
+    .menu-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem; font-weight: 900; color: var(--caramel);
+    }
+    .add-btn {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--espresso); color: white;
+      border: none; font-size: 1.2rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.25s ease;
+    }
+    .add-btn:hover { background: var(--caramel); transform: scale(1.1) rotate(90deg); }
+    .menu-badge {
+      position: absolute; top: 1rem; right: 1rem;
+      background: var(--caramel); color: white;
+      padding: 0.2rem 0.6rem; border-radius: 1rem;
+      font-size: 0.65rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+
+    /* ─── SPECIALS ─── */
+    #specials {
+      background: var(--espresso);
+      position: relative; overflow: hidden;
+    }
+    #specials::before {
+      content: ''; position: absolute;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(201,147,90,0.2) 0%, transparent 70%);
+      top: -100px; right: -100px; pointer-events: none;
+    }
+    #specials .section-title { color: var(--cream); }
+    #specials .section-tag { color: var(--caramel); }
+    .specials-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 2rem; margin-top: 3rem;
+    }
+    .special-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 1.5rem; padding: 2rem;
+      transition: all 0.35s ease;
+    }
+    .special-card:hover {
+      background: rgba(201,147,90,0.12);
+      border-color: rgba(201,147,90,0.3);
+      transform: translateY(-4px);
+    }
+    .special-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+    .special-emoji { font-size: 2.5rem; }
+    .special-time {
+      font-size: 0.75rem; color: var(--caramel);
+      font-family: 'Space Mono', monospace;
+      background: rgba(201,147,90,0.15); padding: 0.3rem 0.7rem; border-radius: 1rem;
+    }
+    .special-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem; font-weight: 700; color: var(--cream);
+      margin-bottom: 0.5rem;
+    }
+    .special-desc { font-size: 0.85rem; color: rgba(245,239,230,0.6); line-height: 1.6; }
+    .special-price { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 900; color: var(--caramel); margin-top: 1rem; }
+    .special-price del { font-size: 1rem; color: rgba(245,239,230,0.3); margin-right: 0.5rem; }
+
+    /* ─── VIBE / ABOUT ─── */
+    #about {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 5rem; align-items: center;
+    }
+    .about-visual {
+      position: relative;
+    }
+    .about-img-main {
+      width: 100%; aspect-ratio: 4/5;
+      background: linear-gradient(135deg, var(--mocha) 0%, var(--espresso) 100%);
+      border-radius: 2rem 2rem 50% 50% / 2rem 2rem 30% 30%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 8rem; position: relative; overflow: hidden;
+    }
+    .about-img-main::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(160deg, rgba(201,147,90,0.25) 0%, transparent 60%);
+    }
+    .about-chip {
+      position: absolute; background: white;
+      border-radius: 1rem; padding: 1rem 1.5rem;
+      box-shadow: 0 12px 32px rgba(44,26,14,0.12);
+    }
+    .ac-1 { top: 2rem; right: -2rem; }
+    .ac-2 { bottom: 3rem; left: -2rem; }
+    .about-chip-title { font-size: 0.72rem; color: var(--latte); text-transform: uppercase; letter-spacing: 0.08em; }
+    .about-chip-val { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 900; color: var(--espresso); }
+    .about-features { margin-top: 2rem; display: flex; flex-direction: column; gap: 1rem; }
+    .feature-row {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 1rem 1.2rem; border-radius: 1rem;
+      background: var(--warm); transition: all 0.3s ease;
+    }
+    .feature-row:hover { background: var(--caramel); color: white; transform: translateX(6px); }
+    .feature-icon { font-size: 1.3rem; }
+    .feature-text { font-size: 0.9rem; font-weight: 500; }
+
+    /* ─── TESTIMONIALS ─── */
+    #reviews { background: white; }
+    .reviews-header { text-align: center; margin-bottom: 3rem; }
+    .reviews-track-wrap { overflow: hidden; position: relative; }
+    .reviews-track {
+      display: flex; gap: 1.5rem;
+      transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
+    }
+    .review-card {
+      min-width: 340px; background: var(--cream);
+      border-radius: 1.5rem; padding: 2rem;
+      flex-shrink: 0;
+    }
+    .review-stars { font-size: 1rem; color: var(--caramel); margin-bottom: 1rem; letter-spacing: 2px; }
+    .review-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem; font-style: italic;
+      color: var(--espresso); line-height: 1.6; margin-bottom: 1.5rem;
+    }
+    .review-author { display: flex; align-items: center; gap: 0.8rem; }
+    .review-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--warm); display: flex;
+      align-items: center; justify-content: center; font-size: 1.2rem;
+    }
+    .review-name { font-weight: 600; font-size: 0.9rem; color: var(--espresso); }
+    .review-dept { font-size: 0.78rem; color: var(--latte); }
+    .reviews-nav { display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem; }
+    .dot-btn {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--warm); border: none; cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .dot-btn.active { background: var(--caramel); width: 24px; border-radius: 4px; }
+
+    /* ─── EVENTS ─── */
+    #events {
+      background: linear-gradient(160deg, var(--cream) 0%, var(--warm) 100%);
+    }
+    .events-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem; }
+    .events-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; }
+    .event-card {
+      background: white; border-radius: 1.5rem; overflow: hidden;
+      transition: all 0.35s ease;
+    }
+    .event-card:hover { transform: translateY(-6px); box-shadow: 0 20px 48px rgba(44,26,14,0.12); }
+    .event-top {
+      background: var(--espresso); padding: 2rem;
+      display: flex; justify-content: space-between; align-items: flex-start;
+    }
+    .event-date { color: var(--cream); }
+    .event-day { font-family: 'Playfair Display', serif; font-size: 2.5rem; font-weight: 900; line-height: 1; }
+    .event-month { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--caramel); }
+    .event-icon { font-size: 2rem; }
+    .event-body { padding: 1.5rem; }
+    .event-type { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--caramel); font-family: 'Space Mono', monospace; margin-bottom: 0.5rem; }
+    .event-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--espresso); margin-bottom: 0.5rem; }
+    .event-info { font-size: 0.82rem; color: var(--latte); line-height: 1.5; }
+    .event-footer { padding: 0 1.5rem 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+    .event-time { font-size: 0.8rem; color: var(--latte); display: flex; align-items: center; gap: 0.3rem; }
+    .event-rsvp {
+      font-size: 0.78rem; font-weight: 600;
+      color: var(--caramel); text-decoration: none;
+      border-bottom: 1.5px solid var(--caramel);
+      padding-bottom: 1px; transition: all 0.2s ease;
+    }
+    .event-rsvp:hover { color: var(--espresso); border-color: var(--espresso); }
+
+    /* ─── HOURS BANNER ─── */
+    .hours-banner {
+      background: var(--caramel);
+      padding: 3rem 4rem;
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 2rem;
+    }
+    .hours-item { text-align: center; }
+    .hours-day {
+      font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.7); margin-bottom: 0.5rem;
+    }
+    .hours-time {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem; font-weight: 900; color: white;
+    }
+
+    /* ─── NEWSLETTER ─── */
+    #newsletter {
+      background: var(--espresso); text-align: center;
+      padding: 6rem 4rem;
+    }
+    #newsletter .section-title { color: var(--cream); margin-bottom: 1rem; }
+    #newsletter p { color: rgba(245,239,230,0.6); font-size: 1rem; margin-bottom: 2.5rem; }
+    .newsletter-form {
+      display: flex; gap: 0.75rem; max-width: 440px; margin: 0 auto;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .nl-input {
+      flex: 1; min-width: 220px;
+      padding: 0.85rem 1.4rem; border-radius: 3rem;
+      border: 1.5px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.08); color: var(--cream);
+      font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+      outline: none; transition: all 0.3s ease;
+    }
+    .nl-input::placeholder { color: rgba(245,239,230,0.4); }
+    .nl-input:focus { border-color: var(--caramel); background: rgba(255,255,255,0.12); }
+    .nl-toast {
+      display: none; background: var(--caramel);
+      color: white; padding: 0.8rem 1.5rem;
+      border-radius: 2rem; font-size: 0.88rem;
+      margin-top: 1rem; font-weight: 500;
+    }
+    .nl-toast.show { display: block; animation: fadeUp 0.4s ease; }
+
+    /* ─── CART ─── */
+    .cart-fab {
+      position: fixed; bottom: 2rem; right: 2rem;
+      background: var(--espresso); color: white;
+      width: 60px; height: 60px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; cursor: pointer; z-index: 400;
+      box-shadow: 0 8px 24px rgba(44,26,14,0.25);
+      transition: all 0.3s ease; border: none;
+    }
+    .cart-fab:hover { background: var(--caramel); transform: scale(1.08); }
+    .cart-badge {
+      position: absolute; top: -4px; right: -4px;
+      background: var(--caramel); color: white;
+      width: 22px; height: 22px; border-radius: 50%;
+      font-size: 0.72rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      display: none;
+    }
+    .cart-panel {
+      position: fixed; right: -420px; top: 0; bottom: 0;
+      width: 400px; background: white;
+      z-index: 600; transition: right 0.4s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: -8px 0 40px rgba(44,26,14,0.12);
+      display: flex; flex-direction: column;
+    }
+    .cart-panel.open { right: 0; }
+    .cart-header {
+      padding: 1.5rem 2rem; border-bottom: 1px solid var(--warm);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .cart-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 900; color: var(--espresso); }
+    .cart-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--latte); }
+    .cart-items { flex: 1; overflow-y: auto; padding: 1.5rem 2rem; }
+    .cart-empty { text-align: center; color: var(--latte); padding: 3rem 1rem; font-size: 0.9rem; }
+    .cart-item {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 1rem 0; border-bottom: 1px solid var(--warm);
+    }
+    .cart-item-emoji { font-size: 2rem; }
+    .cart-item-info { flex: 1; }
+    .cart-item-name { font-weight: 600; font-size: 0.9rem; color: var(--espresso); }
+    .cart-item-price { font-size: 0.85rem; color: var(--caramel); font-weight: 500; }
+    .cart-item-remove { background: none; border: none; cursor: pointer; color: var(--latte); font-size: 1rem; }
+    .cart-footer {
+      padding: 1.5rem 2rem; border-top: 1px solid var(--warm);
+    }
+    .cart-total { display: flex; justify-content: space-between; font-weight: 600; font-size: 1rem; color: var(--espresso); margin-bottom: 1rem; }
+    .checkout-btn {
+      width: 100%; padding: 1rem; border-radius: 3rem;
+      background: var(--espresso); color: white;
+      font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+      font-weight: 600; border: none; cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .checkout-btn:hover { background: var(--caramel); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: #1a0e07; color: rgba(245,239,230,0.7);
+      padding: 4rem; display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem;
+    }
+    .footer-brand .nav-logo { font-size: 1.8rem; display: block; margin-bottom: 1rem; }
+    .footer-brand p { font-size: 0.85rem; line-height: 1.7; max-width: 260px; }
+    .footer-col h4 {
+      font-family: 'Playfair Display', serif;
+      color: var(--cream); font-size: 1rem; margin-bottom: 1.2rem;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+    .footer-col ul a { color: rgba(245,239,230,0.5); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+    .footer-col ul a:hover { color: var(--caramel); }
+    .footer-bottom {
+      background: #0f0805; padding: 1.5rem 4rem;
+      display: flex; justify-content: space-between; align-items: center;
+      color: rgba(245,239,230,0.3); font-size: 0.78rem;
+    }
+
+    /* ─── OVERLAY ─── */
+    .overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+      z-index: 550; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .overlay.show { opacity: 1; pointer-events: all; }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; } to { opacity: 1; }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); } to { transform: rotate(360deg); }
+    }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; } 50% { opacity: 0.5; }
+    }
+
+    /* ─── SCROLL REVEAL ─── */
+    .reveal { opacity: 0; transform: translateY(40px); transition: all 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      nav.scrolled { padding: 0.7rem 1.5rem; }
+      .nav-links { display: none; }
+      .hero { grid-template-columns: 1fr; padding: 7rem 1.5rem 4rem; }
+      .hero-visual { display: none; }
+      section { padding: 4rem 1.5rem; }
+      .specials-grid { grid-template-columns: 1fr; }
+      #about { grid-template-columns: 1fr; gap: 2rem; padding: 4rem 1.5rem; }
+      .events-grid { grid-template-columns: 1fr; }
+      .hours-banner { grid-template-columns: 1fr 1fr; padding: 2rem 1.5rem; }
+      footer { grid-template-columns: 1fr 1fr; padding: 2rem 1.5rem; gap: 2rem; }
+      .footer-bottom { flex-direction: column; gap: 0.5rem; padding: 1rem 1.5rem; text-align: center; }
+      .cart-panel { width: 100%; right: -100%; }
+      .events-header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="nav-logo">Brew<span>&</span>Study</div>
+  <ul class="nav-links">
+    <li><a href="#menu">Menu</a></li>
+    <li><a href="#specials">Specials</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#events">Events</a></li>
+    <li><a href="#reviews">Reviews</a></li>
+    <li><a href="#newsletter" class="nav-cta">Order Now</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <span class="hero-tag">Open Monday–Saturday · 7AM–10PM</span>
+    <h1>Your Campus <em>Second Home</em></h1>
+    <p class="hero-sub">Where deadlines meet lattes, and every sip fuels your next big idea. Fresh brews, homemade bites, and vibes made for students.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'})">Explore Menu</button>
+      <button class="btn-outline" onclick="document.getElementById('events').scrollIntoView({behavior:'smooth'})">This Week's Events</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num" data-target="2400">0</span><div class="stat-label">Students served/day</div></div>
+      <div class="stat"><span class="stat-num" data-target="48">0</span><div class="stat-label">Menu items</div></div>
+      <div class="stat"><span class="stat-num" data-target="12">0</span><div class="stat-label">Years running</div></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-card-big">
+      <div class="cup-svg">☕</div>
+      <div class="hero-badge">Fresh Roast<br>Daily</div>
+    </div>
+    <div class="floating-tag ft-1">☕ Espresso — ₹79</div>
+    <div class="floating-tag ft-2">🥐 Croissant — ₹69</div>
+    <div class="floating-tag ft-3">⭐ 4.9 Rating</div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap" aria-hidden="true">
+  <div class="marquee-track">
+    <span class="marquee-item"><span class="marquee-dot">✦</span> Fresh Espresso Daily</span>
+    <span class="marquee-item"><span class="marquee-dot">✦</span> Student Discounts Available</span>
+    <span class="marquee-item"><span class="marquee-dot">✦</span> Free Wi-Fi</span>
+    <span class="marquee-item"><span class="marquee-dot">✦</span> Happy Hour 3–5 PM</span>
+    <span class="marquee-item"><span class="marquee-dot">✦</span> Plant-Based Options</span>
+    <span class="marquee-item"><span class="marquee-dot">✦</span> Study Pods Available</span>
+    <span class="marquee-item"><span class="marquee-dot">✦</span> Fresh Espresso Daily</span>
+    <span class="marquee-item"><span class="marquee-dot">✦</span> Student Discounts Available</span>
+    <span class="marquee-item"><span class="marquee-dot">✦</span> Free Wi-Fi</span>
+    <span class="marquee-item"><span class="marquee-dot">✦</span> Happy Hour 3–5 PM</span>
+    <span class="marquee-item"><span class="marquee-dot">✦</span> Plant-Based Options</span>
+    <span class="marquee-item"><span class="marquee-dot">✦</span> Study Pods Available</span>
+  </div>
+</div>
+
+<!-- MENU -->
+<section id="menu">
+  <div class="menu-header reveal">
+    <span class="section-tag">— Our Menu</span>
+    <h2 class="section-title">Fuel Your Studies</h2>
+    <p style="color:var(--latte);max-width:500px;margin:0 auto;font-size:0.95rem;line-height:1.7">Everything crafted with care. Student ID gets you 10% off on all orders.</p>
+    <div class="menu-tabs" id="menuTabs">
+      <button class="tab-btn active" data-cat="all">All</button>
+      <button class="tab-btn" data-cat="coffee">Coffee</button>
+      <button class="tab-btn" data-cat="food">Food</button>
+      <button class="tab-btn" data-cat="cold">Cold Drinks</button>
+      <button class="tab-btn" data-cat="snacks">Snacks</button>
+    </div>
+  </div>
+  <div class="menu-grid" id="menuGrid"></div>
+</section>
+
+<!-- SPECIALS -->
+<section id="specials">
+  <div class="reveal">
+    <span class="section-tag">— Today's Offers</span>
+    <h2 class="section-title">Daily Specials</h2>
+  </div>
+  <div class="specials-grid reveal">
+    <div class="special-card">
+      <div class="special-header">
+        <span class="special-emoji">🌅</span>
+        <span class="special-time">7 AM – 10 AM</span>
+      </div>
+      <div class="special-name">Sunrise Combo</div>
+      <div class="special-desc">Freshly brewed filter coffee + buttered toast + seasonal fruit bowl. The perfect study starter kit.</div>
+      <div class="special-price"><del>₹180</del> ₹129</div>
+    </div>
+    <div class="special-card">
+      <div class="special-header">
+        <span class="special-emoji">🍽️</span>
+        <span class="special-time">12 PM – 2:30 PM</span>
+      </div>
+      <div class="special-name">Lunch Thali</div>
+      <div class="special-desc">Dal, sabzi, rice, roti and a chilled lassi. Home-style meal to keep you going through afternoon lectures.</div>
+      <div class="special-price"><del>₹220</del> ₹149</div>
+    </div>
+    <div class="special-card">
+      <div class="special-header">
+        <span class="special-emoji">⚡</span>
+        <span class="special-time">3 PM – 5 PM</span>
+      </div>
+      <div class="special-name">Happy Hour</div>
+      <div class="special-desc">Buy any cold coffee, get a snack of the day absolutely free. Tag us and get an extra cookie!</div>
+      <div class="special-price">BOGO Offer</div>
+    </div>
+    <div class="special-card">
+      <div class="special-header">
+        <span class="special-emoji">🌙</span>
+        <span class="special-time">7 PM – 10 PM</span>
+      </div>
+      <div class="special-name">Night Owl Bundle</div>
+      <div class="special-desc">Double shot espresso + our signature dark chocolate brownie. For those late-night assignment warriors.</div>
+      <div class="special-price"><del>₹160</del> ₹119</div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-visual reveal">
+    <div class="about-img-main">☕</div>
+    <div class="about-chip ac-1">
+      <div class="about-chip-title">Est.</div>
+      <div class="about-chip-val">2012</div>
+    </div>
+    <div class="about-chip ac-2">
+      <div class="about-chip-title">Daily Visitors</div>
+      <div class="about-chip-val">2400+</div>
+    </div>
+  </div>
+  <div class="about-content reveal">
+    <span class="section-tag">— Our Story</span>
+    <h2 class="section-title">More Than a Café, It's a <em style="font-style:italic;color:var(--caramel)">Community</em></h2>
+    <p style="color:var(--latte);line-height:1.8;margin-bottom:1.5rem;font-size:0.95rem">Started in 2012 by alumni who wanted a better campus coffee experience, Brew & Study has grown into the beating heart of college life. Whether you're cramming for exams, catching up with friends, or just need a quiet corner — we've got you.</p>
+    <p style="color:var(--latte);line-height:1.8;margin-bottom:2rem;font-size:0.95rem">We source our beans from small farms in Coorg and Chikmagalur, roast them weekly, and craft every cup with intention. Our kitchen team prepares everything fresh daily — no frozen shortcuts here.</p>
+    <div class="about-features">
+      <div class="feature-row"><span class="feature-icon">📶</span><span class="feature-text">High-speed Wi-Fi across all seating zones</span></div>
+      <div class="feature-row"><span class="feature-icon">🔌</span><span class="feature-text">Charging points at every table</span></div>
+      <div class="feature-row"><span class="feature-icon">📚</span><span class="feature-text">Quiet study pods for focused work</span></div>
+      <div class="feature-row"><span class="feature-icon">🌿</span><span class="feature-text">Vegan & allergy-friendly options available</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section id="reviews">
+  <div class="reviews-header reveal">
+    <span class="section-tag">— Student Love</span>
+    <h2 class="section-title">What Campus Says</h2>
+  </div>
+  <div class="reviews-track-wrap">
+    <div class="reviews-track" id="reviewsTrack">
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <div class="review-text">"The cold brew here is absolutely insane. I've been coming every morning before my 8 AM class for two years. Never disappoints."</div>
+        <div class="review-author"><div class="review-avatar">👩</div><div><div class="review-name">Priya Sharma</div><div class="review-dept">CSE, 3rd Year</div></div></div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <div class="review-text">"Best place on campus by far. The study pods saved my semester — quiet, comfortable, and the espresso keeps flowing."</div>
+        <div class="review-author"><div class="review-avatar">👨</div><div><div class="review-name">Arjun Mehta</div><div class="review-dept">MBA, 1st Year</div></div></div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <div class="review-text">"Happy hour is my religion. Free snacks with cold coffee? Whoever thought of that deserves an honorary degree."</div>
+        <div class="review-author"><div class="review-avatar">👩</div><div><div class="review-name">Sneha Patil</div><div class="review-dept">Design, 2nd Year</div></div></div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★☆</div>
+        <div class="review-text">"The lunch thali is genuinely home-level good. As a hostelite, this place is a lifesaver on hard days. Affordable and filling."</div>
+        <div class="review-author"><div class="review-avatar">👨</div><div><div class="review-name">Rahul Desai</div><div class="review-dept">Mechanical, 4th Year</div></div></div>
+      </div>
+      <div class="review-card">
+        <div class="review-stars">★★★★★</div>
+        <div class="review-text">"I did my entire final year project here. The ambiance, the music playlist, and the unlimited refills policy — absolute perfection."</div>
+        <div class="review-author"><div class="review-avatar">👩</div><div><div class="review-name">Anika Reddy</div><div class="review-dept">Law, Final Year</div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="reviews-nav" id="reviewsNav"></div>
+</section>
+
+<!-- EVENTS -->
+<section id="events">
+  <div class="events-header reveal">
+    <div>
+      <span class="section-tag">— Campus Life</span>
+      <h2 class="section-title">Upcoming Events</h2>
+    </div>
+    <a href="#" style="color:var(--caramel);font-weight:600;text-decoration:none;font-size:0.9rem">View all →</a>
+  </div>
+  <div class="events-grid reveal">
+    <div class="event-card">
+      <div class="event-top">
+        <div class="event-date"><div class="event-day">28</div><div class="event-month">March</div></div>
+        <span class="event-icon">🎸</span>
+      </div>
+      <div class="event-body">
+        <div class="event-type">Open Mic</div>
+        <div class="event-name">Unplugged Friday Night</div>
+        <div class="event-info">Grab your guitar or just your ears. Open mic for all campus musicians, poets, and storytellers.</div>
+      </div>
+      <div class="event-footer">
+        <span class="event-time">⏰ 6:30 PM</span>
+        <a class="event-rsvp" href="#">RSVP Free →</a>
+      </div>
+    </div>
+    <div class="event-card">
+      <div class="event-top">
+        <div class="event-date"><div class="event-day">01</div><div class="event-month">April</div></div>
+        <span class="event-icon">🧠</span>
+      </div>
+      <div class="event-body">
+        <div class="event-type">Workshop</div>
+        <div class="event-name">Brew Your Own Coffee</div>
+        <div class="event-info">Learn V60, pour-over, and cold brew techniques from our head barista. Limited seats — 12 max.</div>
+      </div>
+      <div class="event-footer">
+        <span class="event-time">⏰ 11:00 AM</span>
+        <a class="event-rsvp" href="#">Book ₹99 →</a>
+      </div>
+    </div>
+    <div class="event-card">
+      <div class="event-top">
+        <div class="event-date"><div class="event-day">05</div><div class="event-month">April</div></div>
+        <span class="event-icon">🎮</span>
+      </div>
+      <div class="event-body">
+        <div class="event-type">Game Night</div>
+        <div class="event-name">Board Games & Brews</div>
+        <div class="event-info">Chess, Catan, Codenames, Jenga — bring your squad. Winner gets a free coffee for a week!</div>
+      </div>
+      <div class="event-footer">
+        <span class="event-time">⏰ 5:00 PM</span>
+        <a class="event-rsvp" href="#">Join Free →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOURS BANNER -->
+<div class="hours-banner reveal">
+  <div class="hours-item"><div class="hours-day">Monday – Friday</div><div class="hours-time">7:00 AM – 10:00 PM</div></div>
+  <div class="hours-item"><div class="hours-day">Saturday</div><div class="hours-time">8:00 AM – 11:00 PM</div></div>
+  <div class="hours-item"><div class="hours-day">Sunday</div><div class="hours-time">9:00 AM – 8:00 PM</div></div>
+  <div class="hours-item"><div class="hours-day">Location</div><div class="hours-time">Block C, Main Campus</div></div>
+</div>
+
+<!-- NEWSLETTER -->
+<section id="newsletter">
+  <span class="section-tag" style="color:var(--caramel)">— Stay Updated</span>
+  <h2 class="section-title">Never Miss a Deal</h2>
+  <p>Get daily specials, event updates, and exclusive student offers straight to your inbox.</p>
+  <div class="newsletter-form">
+    <input class="nl-input" id="nlEmail" type="email" placeholder="your@college.edu"/>
+    <button class="btn-primary" onclick="subscribeNewsletter()">Subscribe</button>
+  </div>
+  <div class="nl-toast" id="nlToast">🎉 You're in! Check your inbox for a welcome treat.</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    <span class="nav-logo">Brew<span style="color:var(--caramel)">&</span>Study</span>
+    <p>The college café that's been fueling dreams and deadlines since 2012. Come for the coffee, stay for the community.</p>
+  </div>
+  <div class="footer-col">
+    <h4>Menu</h4>
+    <ul>
+      <li><a href="#">Hot Coffee</a></li>
+      <li><a href="#">Cold Brews</a></li>
+      <li><a href="#">Snacks</a></li>
+      <li><a href="#">Meals</a></li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <h4>Quick Links</h4>
+    <ul>
+      <li><a href="#">About Us</a></li>
+      <li><a href="#">Events</a></li>
+      <li><a href="#">Gallery</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <h4>Connect</h4>
+    <ul>
+      <li><a href="#">Instagram</a></li>
+      <li><a href="#">WhatsApp Group</a></li>
+      <li><a href="#">Campus Portal</a></li>
+      <li><a href="#">Feedback</a></li>
+    </ul>
+  </div>
+</footer>
+<div class="footer-bottom">
+  <span>© 2025 Brew & Study. All rights reserved.</span>
+  <span>Made with ☕ for students, by students.</span>
+</div>
+
+<!-- CART FAB -->
+<button class="cart-fab" id="cartFab" onclick="toggleCart()">
+  🛒
+  <span class="cart-badge" id="cartBadge">0</span>
+</button>
+
+<!-- CART PANEL -->
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-header">
+    <span class="cart-title">Your Order</span>
+    <button class="cart-close" onclick="toggleCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems">
+    <div class="cart-empty">Your cart is empty.<br>Add something delicious! 🍪</div>
+  </div>
+  <div class="cart-footer">
+    <div class="cart-total"><span>Total</span><span id="cartTotal">₹0</span></div>
+    <button class="checkout-btn" onclick="checkout()">Place Order →</button>
+  </div>
+</div>
+
+<script>
+  // ── CURSOR ──
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  document.addEventListener('mousemove', e => {
+    cursor.style.transform = `translate(${e.clientX - 6}px, ${e.clientY - 6}px)`;
+    ring.style.transform = `translate(${e.clientX - 18}px, ${e.clientY - 18}px)`;
+  });
+  document.querySelectorAll('a,button,.menu-card,.special-card,.event-card').forEach(el => {
+    el.addEventListener('mouseenter', () => { cursor.style.transform += ' scale(2)'; ring.style.opacity = '1'; });
+    el.addEventListener('mouseleave', () => { cursor.style.transform = cursor.style.transform.replace(' scale(2)',''); ring.style.opacity = '0.5'; });
+  });
+
+  // ── NAV SCROLL ──
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // ── COUNT UP ──
+  const counters = document.querySelectorAll('[data-target]');
+  const countObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target;
+      const target = +el.dataset.target;
+      let count = 0;
+      const step = Math.ceil(target / 60);
+      const timer = setInterval(() => {
+        count = Math.min(count + step, target);
+        el.textContent = count >= 1000 ? (count/1000).toFixed(1)+'k' : count;
+        if (count >= target) clearInterval(timer);
+      }, 25);
+      countObs.unobserve(el);
+    });
+  }, { threshold: 0.5 });
+  counters.forEach(c => countObs.observe(c));
+
+  // ── MENU DATA ──
+  const menuItems = [
+    { id:1, cat:'coffee', emoji:'☕', name:'Classic Espresso', desc:'Double shot, rich and bold. Straight from our Coorg roast.', price:79, badge:'Best Seller' },
+    { id:2, cat:'coffee', emoji:'🥛', name:'Café Latte', desc:'Silky steamed milk with a shot of our signature espresso.', price:99 },
+    { id:3, cat:'coffee', emoji:'🫗', name:'Cappuccino', desc:'Equal parts espresso, steamed milk, and velvety foam.', price:99 },
+    { id:4, cat:'coffee', emoji:'🍫', name:'Mocha Delight', desc:'Espresso, chocolate, steamed milk and whipped cream.', price:119, badge:'Popular' },
+    { id:5, cat:'cold', emoji:'🧊', name:'Cold Brew', desc:'12-hour slow-steeped coffee concentrate over ice.', price:129, badge:'New' },
+    { id:6, cat:'cold', emoji:'🍵', name:'Iced Matcha Latte', desc:'Premium ceremonial grade matcha with oat milk.', price:139 },
+    { id:7, cat:'cold', emoji:'🫧', name:'Dalgona Coffee', desc:'Whipped coffee foam over chilled milk. Instagram-worthy.', price:109 },
+    { id:8, cat:'cold', emoji:'🍋', name:'Lemon Honey Soda', desc:'Freshly squeezed lemon, honey, and sparkling water.', price:79 },
+    { id:9, cat:'food', emoji:'🥐', name:'Butter Croissant', desc:'Flaky, golden, freshly baked every morning at 6AM.', price:69 },
+    { id:10, cat:'food', emoji:'🥪', name:'Masala Toast', desc:'Spiced potato filling in toasted multigrain bread.', price:89 },
+    { id:11, cat:'food', emoji:'🍳', name:'Egg Bhurji Wrap', desc:'Scrambled eggs with veggies in a warm whole wheat roti.', price:99, badge:'Staff Pick' },
+    { id:12, cat:'food', emoji:'🫓', name:'Avocado Toast', desc:'Smashed avocado on sourdough with chilli flakes and lemon.', price:129 },
+    { id:13, cat:'snacks', emoji:'🍪', name:'Choco Chip Cookie', desc:'Thick, chewy, loaded with Belgian chocolate chips.', price:49 },
+    { id:14, cat:'snacks', emoji:'🧁', name:'Blueberry Muffin', desc:'Moist muffin bursting with real blueberries.', price:59 },
+    { id:15, cat:'snacks', emoji:'🍫', name:'Dark Choc Brownie', desc:'Dense, fudgy brownie made with 70% dark chocolate.', price:69, badge:'Fan Fav' },
+    { id:16, cat:'snacks', emoji:'🧆', name:'Falafel Bites', desc:'Crispy chickpea bites with mint chutney dipping sauce.', price:79 },
+  ];
+
+  let currentCat = 'all';
+  let cart = [];
+
+  function renderMenu(cat) {
+    const grid = document.getElementById('menuGrid');
+    const filtered = cat === 'all' ? menuItems : menuItems.filter(i => i.cat === cat);
+    grid.innerHTML = filtered.map((item, idx) => `
+      <div class="menu-card" style="animation-delay:${idx * 0.07}s">
+        ${item.badge ? `<span class="menu-badge">${item.badge}</span>` : ''}
+        <span class="menu-emoji">${item.emoji}</span>
+        <div class="menu-name">${item.name}</div>
+        <div class="menu-desc">${item.desc}</div>
+        <div class="menu-footer">
+          <span class="menu-price">₹${item.price}</span>
+          <button class="add-btn" onclick="addToCart(${item.id})" title="Add to cart">+</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('menuTabs').addEventListener('click', e => {
+    if (!e.target.matches('.tab-btn')) return;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    currentCat = e.target.dataset.cat;
+    renderMenu(currentCat);
+  });
+
+  renderMenu('all');
+
+  // ── CART ──
+  function addToCart(id) {
+    const item = menuItems.find(i => i.id === id);
+    cart.push(item);
+    updateCart();
+    showAddedFeedback(id);
+    alert(`✅ "${item.name}" cart mein add ho gaya!\nPrice: ₹${item.price}`);
+  }
+
+  function removeFromCart(idx) {
+    const item = cart[idx];
+    if (confirm(`❌ Kya aap "${item.name}" cart se remove karna chahte ho?`)) {
+      cart.splice(idx, 1);
+      updateCart();
+      alert(`🗑️ "${item.name}" cart se remove ho gaya!`);
+    }
+  }
+
+  function updateCart() {
+    const badge = document.getElementById('cartBadge');
+    badge.textContent = cart.length;
+    badge.style.display = cart.length ? 'flex' : 'none';
+
+    const total = cart.reduce((s, i) => s + i.price, 0);
+    document.getElementById('cartTotal').textContent = `₹${total}`;
+
+    const itemsEl = document.getElementById('cartItems');
+    if (!cart.length) {
+      itemsEl.innerHTML = '<div class="cart-empty">Your cart is empty.<br>Add something delicious! 🍪</div>';
+      return;
+    }
+    itemsEl.innerHTML = cart.map((item, idx) => `
+      <div class="cart-item">
+        <span class="cart-item-emoji">${item.emoji}</span>
+        <div class="cart-item-info">
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-price">₹${item.price}</div>
+        </div>
+        <button class="cart-item-remove" onclick="removeFromCart(${idx})">✕</button>
+      </div>
+    `).join('');
+  }
+
+  function showAddedFeedback(id) {
+    const cards = document.querySelectorAll('.menu-card');
+    const allItems = currentCat === 'all' ? menuItems : menuItems.filter(i => i.cat === currentCat);
+    const idx = allItems.findIndex(i => i.id === id);
+    if (cards[idx]) {
+      cards[idx].style.borderColor = 'var(--caramel)';
+      setTimeout(() => { cards[idx].style.borderColor = ''; }, 800);
+    }
+  }
+
+  let cartOpen = false;
+  function toggleCart() {
+    cartOpen = !cartOpen;
+    document.getElementById('cartPanel').classList.toggle('open', cartOpen);
+    document.getElementById('overlay').classList.toggle('show', cartOpen);
+  }
+  document.getElementById('overlay').addEventListener('click', () => {
+    if (cartOpen) toggleCart();
+  });
+
+  function checkout() {
+    if (!cart.length) return;
+    document.getElementById('cartItems').innerHTML = '<div class="cart-empty" style="color:var(--caramel);font-weight:600">🎉 Order placed!<br>Ready in ~10 minutes.</div>';
+    document.getElementById('cartTotal').textContent = '₹0';
+    cart = [];
+    document.getElementById('cartBadge').style.display = 'none';
+    setTimeout(toggleCart, 1500);
+  }
+
+  // ── REVIEWS SLIDER ──
+  const track = document.getElementById('reviewsTrack');
+  const reviewCards = track.querySelectorAll('.review-card');
+  const nav = document.getElementById('reviewsNav');
+  let reviewIdx = 0;
+  reviewCards.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'dot-btn' + (i === 0 ? ' active' : '');
+    dot.onclick = () => goToReview(i);
+    nav.appendChild(dot);
+  });
+  function goToReview(i) {
+    reviewIdx = i;
+    track.style.transform = `translateX(-${i * 356}px)`;
+    nav.querySelectorAll('.dot-btn').forEach((d,j) => d.classList.toggle('active', j === i));
+  }
+  setInterval(() => {
+    goToReview((reviewIdx + 1) % reviewCards.length);
+  }, 4000);
+
+  // ── NEWSLETTER ──
+  function subscribeNewsletter() {
+    const email = document.getElementById('nlEmail').value;
+    if (!email || !email.includes('@')) { alert('Please enter a valid email!'); return; }
+    document.getElementById('nlToast').classList.add('show');
+    document.getElementById('nlEmail').value = '';
+    setTimeout(() => document.getElementById('nlToast').classList.remove('show'), 4000);
+  }
+  document.getElementById('nlEmail').addEventListener('keydown', e => { if (e.key === 'Enter') subscribeNewsletter(); });
+
+  // ── SCROLL REVEAL ──
+  const revealObs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+</script>
+</body>
+</html>
